@@ -3,10 +3,11 @@ import bcrypt from 'bcryptjs';
 import { users, customers, invoices } from '../lib/placeholder-data';
 
 // ✅ SQL client setup with Neon
-const sql = postgres(process.env.POSTGRES_URL!, {
-  ssl: { rejectUnauthorized: false },
-  transform: postgres.camel,
+const sql = postgres(process.env.POSTGRES_URL || 'postgres://localhost:5432/yourdb', {
+    ssl: { rejectUnauthorized: false },
+    transform: postgres.camel,
 });
+
 
 async function seed() {
   try {
