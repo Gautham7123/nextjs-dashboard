@@ -86,3 +86,11 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type QueryResultRow = {
+  count: string;
+};
+
+export type QueryResult = {
+  rows: QueryResultRow[];
+};

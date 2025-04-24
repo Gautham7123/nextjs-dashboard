@@ -1,6 +1,7 @@
 import postgres from 'postgres';
 import bcrypt from 'bcryptjs';
 import { users, customers, invoices } from '../lib/placeholder-data';
+import { revenue } from '@/app/lib/placeholder-data';
 
 // ✅ SQL client setup with Neon
 const sql = postgres(process.env.POSTGRES_URL || 'postgres://localhost:5432/yourdb', {
@@ -73,6 +74,23 @@ async function seed() {
         INSERT INTO invoices (id, customer_id, amount, status, date)
         VALUES (uuid_generate_v4(), ${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
         ON CONFLICT (id) DO NOTHING
+      `;
+    }
+
+    // Create revenue table
+    await sql`
+      CREATE TABLE IF NOT EXISTS revenue (
+        month VARCHAR(4) NOT NULL UNIQUE,
+        revenue INT NOT NULL
+      )
+    `;
+
+    // Insert revenue data
+    for (const item of revenue) {
+      await sql`
+        INSERT INTO revenue (month, revenue)
+        VALUES (${item.month}, ${item.revenue})
+        ON CONFLICT (month) DO NOTHING
       `;
     }
 
