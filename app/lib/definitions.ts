@@ -31,17 +31,20 @@ export type Revenue = {
   revenue: number;
 };
 
+export type LatestInvoiceRaw = {
+  id: string;
+  name: string;
+  image_url: string;
+  email: string;
+  amount: number;
+};
+
 export type LatestInvoice = {
   id: string;
   name: string;
   image_url: string;
   email: string;
   amount: string;
-};
-
-// The database returns a number for amount, but we later format it to a string with the formatCurrency function
-export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
-  amount: number;
 };
 
 export type InvoicesTable = {
@@ -84,7 +87,7 @@ export type InvoiceForm = {
   id: string;
   customer_id: string;
   amount: number;
-  status: 'pending' | 'paid';
+  status: string;
 };
 
 export type QueryResultRow = {
@@ -93,4 +96,23 @@ export type QueryResultRow = {
 
 export type QueryResult = {
   rows: QueryResultRow[];
+};
+
+export type CardData = {
+  numberOfInvoices: number;
+  numberOfCustomers: number;
+  totalPaidInvoices: string;
+  totalPendingInvoices: string;
+};
+export type CardDataRaw = {
+  numberOfInvoices: number;
+  numberOfCustomers: number;
+  totalPaidInvoices: number;
+  totalPendingInvoices: number;
+};
+export type CardDataFormatted = {
+  numberOfInvoices: number;
+  numberOfCustomers: number;
+  totalPaidInvoices: string; 
+  totalPendingInvoices: string;
 };

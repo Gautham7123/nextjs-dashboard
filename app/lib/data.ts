@@ -11,9 +11,11 @@ import { formatCurrency } from './utils';
 
 export async function fetchRevenue() {
   try {
-    await sql`SELECT NOW()`;
-    // Optional: If the "revenue" table doesn't exist, comment out the next line or ensure the table is created
-    const data = await sql<Revenue[]>`SELECT * FROM revenue`;
+    const data = await sql<Revenue>`
+      SELECT month, revenue
+      FROM revenue
+      ORDER BY month ASC`;
+    
     return data.rows;
   } catch (error) {
     console.error('Database Error:', error);
@@ -23,18 +25,25 @@ export async function fetchRevenue() {
 
 export async function fetchLatestInvoices() {
   try {
-    const data = await sql<LatestInvoiceRaw[]>`
-      SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
+    const data = await sql<LatestInvoiceRaw>`
+      SELECT 
+        invoices.amount, 
+        customers.name, 
+        customers.image_url, 
+        customers.email, 
+        invoices.id
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       ORDER BY invoices.date DESC
       LIMIT 5`;
 
-    const latestInvoices = data.rows.map((invoice) => ({
+    console.log('Latest Invoices Data:', data.rows); // Debug log
+    const formatted = data.rows.map((invoice) => ({
       ...invoice,
       amount: formatCurrency(invoice.amount),
     }));
-    return latestInvoices;
+    console.log('Formatted Invoices:', formatted); // Debug log
+    return formatted;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest invoices.');
@@ -122,7 +131,7 @@ export async function fetchInvoicesPages(query: string) {
 
 export async function fetchInvoiceById(id: string) {
   try {
-    const data = await sql<InvoiceForm[]>`
+    const data = await sql<InvoiceForm>`
       SELECT
         invoices.id,
         invoices.customer_id,
@@ -131,9 +140,14 @@ export async function fetchInvoiceById(id: string) {
       FROM invoices
       WHERE invoices.id = ${id}`;
 
+    if (!data.rows[0]) {
+      throw new Error('Invoice not found');
+    }
+
+    const invoice = data.rows[0];
     return {
-      ...data.rows[0],
-      amount: data.rows[0].amount / 100, // cents to dollars
+      ...invoice,
+      amount: invoice.amount / 100, // cents to dollars
     };
   } catch (error) {
     console.error('Database Error:', error);
@@ -154,15 +168,15 @@ export async function fetchCustomers() {
 
 export async function fetchFilteredCustomers(query: string) {
   try {
-    const data = await sql<CustomersTableType[]>`
+    const data = await sql<CustomersTableType>`
       SELECT
         customers.id,
         customers.name,
         customers.email,
         customers.image_url,
         COUNT(invoices.id) AS total_invoices,
-        SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-        SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
+        COALESCE(SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END), 0) AS total_pending,
+        COALESCE(SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END), 0) AS total_paid
       FROM customers
       LEFT JOIN invoices ON customers.id = invoices.customer_id
       WHERE

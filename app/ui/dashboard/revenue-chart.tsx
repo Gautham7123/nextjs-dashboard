@@ -3,7 +3,8 @@ import { CalendarIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { Revenue } from '@/app/lib/definitions';
 
-// Make sure to update the fetchRevenue function in your data.ts file
+
+
 export default async function RevenueChart({ revenue }: { revenue: Revenue[] }) {
   const chartHeight = 350;
   const { yAxisLabels, topLabel } = generateYAxis(revenue);
@@ -11,6 +12,7 @@ export default async function RevenueChart({ revenue }: { revenue: Revenue[] }) 
   if (!revenue?.length) {
     return null;
   }
+ 
 
   return (
     <div className="w-full md:col-span-4">
