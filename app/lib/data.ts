@@ -11,10 +11,13 @@ import { formatCurrency } from './utils';
 
 export async function fetchRevenue() {
   try {
+    console.log('Fetching revenue data...');
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const data = await sql<Revenue>`
       SELECT month, revenue
       FROM revenue
       ORDER BY month ASC`;
+      console.log('Data fetch completed after 3 seconds.');
     
     return data.rows;
   } catch (error) {
@@ -35,15 +38,12 @@ export async function fetchLatestInvoices() {
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       ORDER BY invoices.date DESC
-      LIMIT 5`;
+      LIMIT 4`;  // Changed from 5 to 4
 
-    console.log('Latest Invoices Data:', data.rows); // Debug log
-    const formatted = data.rows.map((invoice) => ({
+    return data.rows.map((invoice) => ({
       ...invoice,
       amount: formatCurrency(invoice.amount),
     }));
-    console.log('Formatted Invoices:', formatted); // Debug log
-    return formatted;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest invoices.');

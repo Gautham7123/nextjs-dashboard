@@ -1,10 +1,10 @@
-'use client';
-
 import { Suspense } from 'react';
 import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { lusitana } from '@/app/ui/fonts';
+import DashboardSkeleton from '@/app/ui/skeletons';
+import { CardData } from '@/app/lib/definitions';
 import {
   fetchRevenue,
   fetchLatestInvoices,
