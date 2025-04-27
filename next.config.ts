@@ -1,7 +1,11 @@
 import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
-  /* config options here */
+ 
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    // Remove or comment out the ppr option
+    // ppr: true
+  }
 };
 
-export default nextConfig;
+module.exports = nextConfig;
